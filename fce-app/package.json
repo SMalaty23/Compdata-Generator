@@ -1,0 +1,13 @@
+{
+  "name": "fce-creator",
+  "version": "10.1.0",
+  "description": "FCE Creator - Football Competition Editor",
+  "scripts": {
+    "tauri": "tauri",
+    "dev": "npx tauri dev",
+    "build": "npx tauri build"
+  },
+  "devDependencies": {
+    "@tauri-apps/cli": "^2"
+  }
+}

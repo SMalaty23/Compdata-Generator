@@ -1,0 +1,1960 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FCE Creator V10</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="logo">FCE <span>Creator</span> V10</div>
+            
+            <div class="nav-section">
+                <div class="nav-section-title">📁 Data</div>
+                <button class="nav-btn active" onclick="showPage('home')">🏠 Home</button>
+                <button class="nav-btn" onclick="showPage('database')">🗄️ Database Browser</button>
+            </div>
+            
+            <div class="nav-section">
+                <div class="nav-section-title">🏗️ Generators</div>
+                <button class="nav-btn" onclick="showPage('addnation')">🏳️ Add Nation</button>
+                <button class="nav-btn" onclick="showPage('league')">⚽ League Generator</button>
+                <button class="nav-btn" onclick="showPage('cup')">🏆 Cup Generator</button>
+                <button class="nav-btn" onclick="showPage('clubchamp')">🏆 Continental Cup</button>
+                <button class="nav-btn" onclick="showPage('international')">🌍 International</button>
+                <button class="nav-btn" onclick="showPage('schedule')">📅 Schedule</button>
+            </div>
+            
+            <div class="nav-section">
+                <div class="nav-section-title">🛠️ Tools</div>
+                <button class="nav-btn" onclick="showPage('expandcomp')">📈 Expand Competition</button>
+                <button class="nav-btn" onclick="showPage('deletecomp')">🗑️ Delete Competition</button>
+            </div>
+        </div>
+        
+        <!-- Main Content -->
+        <div class="main">
+            <!-- HOME PAGE -->
+            <div id="page-home" class="page active">
+                <h1>🏠 FCE Creator V10</h1>
+                <p class="desc">Football Competition Editor - Load your compdata files to begin</p>
+                
+                <div class="section">
+                    <div class="section-title">📂 Load Compdata Folder</div>
+                    <div class="drop-zone" id="drop-zone-compdata" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" ondrop="handleDropCompdata(event)" onclick="openCompdataFolder()">
+                        <input type="file" id="file-input-compdata" webkitdirectory directory multiple onchange="handleFilesCompdata(this.files)">
+                        <p>📁 Drop compdata folder here</p>
+                    </div>
+                    
+                    <div style="display:flex;gap:8px;margin-top:8px">
+                        <button class="btn btn-secondary" onclick="reloadCompdata()" title="Reload files from the last compdata folder (discards unsaved changes)">🔄 Reload Files</button>
+                        <button class="btn btn-secondary" onclick="resetCompdata()" title="Clear all compdata from memory">🗑️ Clear Compdata</button>
+                    </div>
+                    
+                    <div id="file-list-compdata">
+                        <div class="file-item" id="file-compobj">compobj.txt <span class="status" id="status-compobj">Not loaded</span></div>
+                        <div class="file-item" id="file-settings">settings.txt <span class="status" id="status-settings">Not loaded</span></div>
+                        <div class="file-item" id="file-schedule">schedule.txt <span class="status" id="status-schedule">Not loaded</span></div>
+                        <div class="file-item" id="file-standings">standings.txt <span class="status" id="status-standings">Not loaded</span></div>
+                        <div class="file-item" id="file-advancement">advancement.txt <span class="status" id="status-advancement">Not loaded</span></div>
+                        <div class="file-item" id="file-tasks">tasks.txt <span class="status" id="status-tasks">Not loaded</span></div>
+                        <div class="file-item" id="file-objectives">objectives.txt <span class="status" id="status-objectives">Not loaded</span></div>
+                        <div class="file-item" id="file-initteams">initteams.txt <span class="status" id="status-initteams">Not loaded</span></div>
+                        <div class="file-item" id="file-compids">compids.txt <span class="status" id="status-compids">Not loaded</span></div>
+                        <div class="file-item" id="file-weather">weather.txt <span class="status" id="status-weather">Not loaded</span></div>
+                    </div>
+                </div>
+                
+                <div class="section">
+                    <div class="section-title">🗄️ Load Database Folder (squads)</div>
+                    <div class="drop-zone" id="drop-zone-db" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" ondrop="handleDropDatabase(event)" onclick="openDatabaseFolder()">
+                        <input type="file" id="file-input-db" webkitdirectory directory multiple onchange="handleFilesDatabase(this.files)">
+                        <p>🗄️ Drop squads database folder here</p>
+                    </div>
+                    
+                    <div id="file-list-db">
+                        <div class="file-item" id="file-teams">teams.txt <span class="status" id="status-teams">Not loaded</span></div>
+                        <div class="file-item" id="file-leagues">leagues.txt <span class="status" id="status-leagues">Not loaded</span></div>
+                        <div class="file-item" id="file-leagueteamlinks">leagueteamlinks.txt <span class="status" id="status-leagueteamlinks">Not loaded</span></div>
+                        <div class="file-item" id="file-teamnationlinks">teamnationlinks.txt <span class="status" id="status-teamnationlinks">Not loaded</span></div>
+                    </div>
+                </div>
+                
+                <div class="section">
+                    <div class="section-title">📊 Compdata Hierarchy</div>
+                    <div class="grid grid-3">
+                        <div class="field">
+                            <label>Confederations</label>
+                            <input type="text" id="stat-confeds" value="0" readonly>
+                        </div>
+                        <div class="field">
+                            <label>Nations</label>
+                            <input type="text" id="stat-nations" value="0" readonly>
+                        </div>
+                        <div class="field">
+                            <label>Competitions</label>
+                            <input type="text" id="stat-comps" value="0" readonly>
+                        </div>
+                    </div>
+                    <div class="field" style="margin-top:12px">
+                        <label>Next Available ID</label>
+                        <input type="text" id="stat-nextid" value="0" readonly>
+                    </div>
+                </div>
+                
+                <div class="section">
+                    <div class="section-title">🗄️ Squads Database</div>
+                    <div class="grid grid-4">
+                        <div class="field">
+                            <label>Teams</label>
+                            <input type="text" id="stat-teams" value="0" readonly>
+                        </div>
+                        <div class="field">
+                            <label>Leagues</label>
+                            <input type="text" id="stat-leagues" value="0" readonly>
+                        </div>
+                        <div class="field">
+                            <label>Team-League Links</label>
+                            <input type="text" id="stat-teamleagues" value="0" readonly>
+                        </div>
+                        <div class="field">
+                            <label>National Teams</label>
+                            <input type="text" id="stat-teamnations" value="0" readonly>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="section">
+                    <div class="section-title">📤 Export</div>
+                    <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px">
+                        <div>compobj <span class="badge" id="count-compobj">0</span></div>
+                        <div>settings <span class="badge" id="count-settings">0</span></div>
+                        <div>schedule <span class="badge" id="count-schedule">0</span></div>
+                        <div>standings <span class="badge" id="count-standings">0</span></div>
+                        <div>advancement <span class="badge" id="count-advancement">0</span></div>
+                        <div>tasks <span class="badge" id="count-tasks">0</span></div>
+                        <div>objectives <span class="badge" id="count-objectives">0</span></div>
+                        <div>initteams <span class="badge" id="count-initteams">0</span></div>
+                        <div>compids <span class="badge" id="count-compids">0</span></div>
+                        <div>weather <span class="badge" id="count-weather">0</span></div>
+                    </div>
+                    <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+                        <button class="btn btn-primary" onclick="exportAll()">📥 Export All Changed</button>
+                        <button class="btn btn-primary" onclick="exportZip()">📦 Export as ZIP</button>
+                        <button class="btn btn-secondary" onclick="exportZipAll()">📦 Export ALL as ZIP</button>
+                        <span style="margin-left:auto;display:flex;gap:6px;align-items:center">
+                            <button id="undo-btn" class="btn btn-secondary" onclick="undo()" disabled style="opacity:0.5">↩️ Undo</button>
+                            <button id="redo-btn" class="btn btn-secondary" onclick="redo()" disabled style="opacity:0.5">↪️ Redo</button>
+                            <span id="undo-info" style="font-size:0.75rem;color:#8b949e;min-width:35px">0/0</span>
+                        </span>
+                    </div>
+                </div>
+                
+                <div class="section">
+                    <div class="section-title">👁️ Output Preview (Compdata)</div>
+                    <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px">
+                        <button class="btn btn-secondary btn-small" onclick="showPreview('compobj')">compobj</button>
+                        <button class="btn btn-secondary btn-small" onclick="showPreview('settings')">settings</button>
+                        <button class="btn btn-secondary btn-small" onclick="showPreview('schedule')">schedule</button>
+                        <button class="btn btn-secondary btn-small" onclick="showPreview('standings')">standings</button>
+                        <button class="btn btn-secondary btn-small" onclick="showPreview('advancement')">advancement</button>
+                        <button class="btn btn-secondary btn-small" onclick="showPreview('tasks')">tasks</button>
+                        <button class="btn btn-secondary btn-small" onclick="showPreview('objectives')">objectives</button>
+                        <button class="btn btn-secondary btn-small" onclick="showPreview('initteams')">initteams</button>
+                        <button class="btn btn-secondary btn-small" onclick="showPreview('compids')">compids</button>
+                        <button class="btn btn-secondary btn-small" onclick="showPreview('weather')">weather</button>
+                    </div>
+                    <div id="preview-container" style="background:#0d1117;border:1px solid #30363d;border-radius:6px;padding:10px;font-family:monospace;font-size:0.7rem;min-height:200px;max-height:80vh;overflow-y:auto;white-space:pre-wrap;">
+                        <span style="color:#8b949e">Select a file to preview</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- DATABASE BROWSER PAGE -->
+            <div id="page-database" class="page">
+                <h1>🗄️ Database Browser</h1>
+                <p class="desc">Browse teams, leagues, and national teams from the database</p>
+                
+                <div class="section">
+                    <div class="section-title">🔍 Search Teams</div>
+                    <div class="grid">
+                        <div class="field wide">
+                            <label>Search by name</label>
+                            <input type="text" id="db-search" placeholder="Search Arsenal, Real Madrid, etc..." oninput="dbSearchTeams()">
+                        </div>
+                    </div>
+                    <div id="db-search-results" style="margin-top:10px;max-height:200px;overflow-y:auto"></div>
+                </div>
+                
+                <div class="section">
+                    <div class="section-title">🌍 Browse by Nation</div>
+                    <div class="grid">
+                        <div class="field">
+                            <label>Select Nation</label>
+                            <select id="db-nation" onchange="dbLoadNation()">
+                                <option value="">-- Select Nation --</option>
+                            </select>
+                        </div>
+                        <div class="field">
+                            <label>Select League</label>
+                            <select id="db-league" onchange="dbLoadLeague()">
+                                <option value="">-- Select League --</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="section">
+                    <div class="section-title">📋 Teams <span class="badge" id="db-team-count">0</span></div>
+                    <div id="db-teams-list" style="max-height:400px;overflow-y:auto">
+                        <div style="color:#8b949e">Select a nation or league to view teams</div>
+                    </div>
+                </div>
+                
+                <div class="section">
+                    <div class="section-title">🏆 National Teams <span class="badge" id="db-national-count">0</span></div>
+                    <div id="db-national-list" style="max-height:300px;overflow-y:auto">
+                        <div style="color:#8b949e">Select a nation to view national team players</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- ADD NATION PAGE -->
+            <div id="page-addnation" class="page">
+                <h1>🏳️ Add Nation</h1>
+                <p class="desc">Add a nation under a confederation with settings and weather</p>
+                
+                <div class="section">
+                    <div class="section-title">🔍 Search Nation Database</div>
+                    <div class="grid">
+                        <div class="field wide">
+                            <label>Search (type to find)</label>
+                            <input type="text" id="nation-search" placeholder="Search Egypt, Saudi, etc..." oninput="searchNations()">
+                        </div>
+                    </div>
+                    <div id="nation-search-results" style="max-height:150px;overflow-y:auto;margin-top:8px"></div>
+                    
+                    <div style="margin-top:12px">
+                        <label style="font-size:0.65rem;color:#8b949e">Quick Groups:</label>
+                        <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:6px">
+                            <button class="btn btn-secondary btn-small" onclick="showNationGroup('GCC')">🇸🇦 GCC (6)</button>
+                            <button class="btn btn-secondary btn-small" onclick="showNationGroup('Arab')">🌙 Arab (22)</button>
+                            <button class="btn btn-secondary btn-small" onclick="showNationGroup('Africa')">🌍 Africa (20)</button>
+                            <button class="btn btn-secondary btn-small" onclick="showNationGroup('Asia')">🌏 Asia (20)</button>
+                            <button class="btn btn-secondary btn-small" onclick="showNationGroup('Europe')">🇪🇺 Europe (20)</button>
+                            <button class="btn btn-secondary btn-small" onclick="showNationGroup('South America')">🌎 S.America (10)</button>
+                            <button class="btn btn-secondary btn-small" onclick="showNationGroup('CONCACAF')">⚽ CONCACAF (10)</button>
+                        </div>
+                    </div>
+                    <div id="nation-group-list" style="margin-top:10px;max-height:150px;overflow-y:auto"></div>
+                </div>
+                
+                <div class="section">
+                    <div class="section-title">➕ Nation Details</div>
+                    <div class="grid">
+                        <div class="field">
+                            <label>Parent Confederation</label>
+                            <select id="nation-parent">
+                                <option value="">-- Load compobj first --</option>
+                            </select>
+                        </div>
+                        <div class="field">
+                            <label>3-4 Letter Code</label>
+                            <input type="text" id="nation-code" placeholder="e.g. EGYP" maxlength="4">
+                        </div>
+                        <div class="field">
+                            <label>FIFA Nation ID</label>
+                            <input type="number" id="nation-id" placeholder="e.g. 111">
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="section">
+                    <div class="section-title">⚙️ Settings</div>
+                    <div class="grid grid-4">
+                        <div class="field">
+                            <label>Season Start</label>
+                            <select id="nation-season">
+                                <option value="JUL">JUL (Europe)</option>
+                                <option value="AUG">AUG (England)</option>
+                                <option value="JAN">JAN (S.America)</option>
+                                <option value="MAR">MAR (MLS)</option>
+                            </select>
+                        </div>
+                        <div class="field">
+                            <label>Yellows for Ban</label>
+                            <select id="nation-yellows">
+                                <option value="5" selected>5</option>
+                                <option value="4">4</option>
+                                <option value="3">3</option>
+                            </select>
+                        </div>
+                        <div class="field">
+                            <label>Red Card Ban</label>
+                            <select id="nation-redban">
+                                <option value="1" selected>1 game</option>
+                                <option value="2">2 games</option>
+                                <option value="3">3 games</option>
+                            </select>
+                        </div>
+                        <div class="field">
+                            <label>Int'l Dependency</label>
+                            <select id="nation-intldep">
+                                <option value="MEN">MEN</option>
+                                <option value="NONE">NONE</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="section">
+                    <div class="section-title">🌤️ Weather</div>
+                    <div class="grid">
+                        <div class="field">
+                            <label>Weather Preset</label>
+                            <select id="nation-weather">
+                                <option value="europe">🌧️ European (Mild)</option>
+                                <option value="middleeast">☀️ Middle East (Hot)</option>
+                                <option value="tropical">🌴 Tropical (Humid)</option>
+                                <option value="southam">🌦️ South America</option>
+                                <option value="nordic">❄️ Nordic (Cold)</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="section">
+                    <button class="btn btn-primary" onclick="addNation()" style="width:100%">➕ Add Nation</button>
+                </div>
+            </div>
+            
+            <!-- LEAGUE GENERATOR PAGE -->
+            <div id="page-league" class="page">
+                <h1>⚽ League Generator</h1>
+                <p class="desc">Create a domestic league competition</p>
+                
+                <div class="section">
+                    <div class="section-title">📋 Select League</div>
+                    <div class="grid">
+                        <div class="field wide">
+                            <label>League from Database</label>
+                            <select id="league-dbid" onchange="onLeagueDbSelect()">
+                                <option value="">-- Load database first --</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="grid grid-3" style="margin-top:10px">
+                        <div class="field">
+                            <label>Parent Nation</label>
+                            <select id="league-parent" onchange="autoSetStartMonthFromNation(this.value)">
+                                <option value="">-- Auto from DB --</option>
+                            </select>
+                        </div>
+                        <div class="field">
+                            <label>Code</label>
+                            <input type="text" id="league-code" placeholder="C13">
+                        </div>
+                        <div class="field">
+                            <label>Asset ID</label>
+                            <input type="number" id="league-assetid" placeholder="13">
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="section">
+                    <div class="section-title">⚽ League Type</div>
+                    <div class="grid grid-2">
+                        <div class="field">
+                            <label>Format</label>
+                            <select id="league-type" onchange="onLeagueTypeChange()">
+                                <option value="standard">Standard (Single Group)</option>
+                                <option value="split">Split Season (Championship + Bottom)</option>
+                                <option value="playoff">League + Playoff (MLS Style)</option>
+                            </select>
+                        </div>
+                        <div class="field">
+                            <label>Teams</label>
+                            <input type="number" id="league-teams" value="18" min="4" max="24">
+                        </div>
+                    </div>
+                    <div class="grid grid-2" style="margin-top:10px">
+                        <div class="field">
+                            <label>Games vs Each Team</label>
+                            <select id="league-numgames">
+                                <option value="2">2 (Home & Away)</option>
+                                <option value="1">1 (Single)</option>
+                                <option value="3">3 (Triple)</option>
+                                <option value="4">4 (Quadruple)</option>
+                            </select>
+                        </div>
+                        <div class="field" id="league-split-options" style="display:none">
+                            <label>Top Group Size</label>
+                            <input type="number" id="league-split-top" value="6" min="2" max="12">
+                        </div>
+                    </div>
+                    <div class="grid grid-2" id="league-playoff-options" style="display:none;margin-top:10px">
+                        <div class="field">
+                            <label>Playoff Teams</label>
+                            <input type="number" id="league-playoff-teams" value="4" min="2" max="8">
+                        </div>
+                        <div class="field">
+                            <label>Knockout Legs</label>
+                            <select id="league-playoff-legs">
+                                <option value="1">Single Leg</option>
+                                <option value="2">Two Legs</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="section">
+                    <div class="section-title">📈 Promotion</div>
+                    <div class="grid grid-2">
+                        <div class="field">
+                            <label>Direct Promotion</label>
+                            <input type="number" id="league-promotion" value="0" min="0" max="6">
+                        </div>
+                        <div class="field">
+                            <label>Promotion Playoff</label>
+                            <input type="number" id="league-promotion-playoff" value="0" min="0" max="6">
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="section">
+                    <div class="section-title">📉 Relegation</div>
+                    <div class="grid grid-2">
+                        <div class="field">
+                            <label>Direct Relegation</label>
+                            <input type="number" id="league-relegation" value="0" min="0" max="6">
+                        </div>
+                        <div class="field">
+                            <label>Relegation Playoff</label>
+                            <input type="number" id="league-relegation-playoff" value="0" min="0" max="3">
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="section">
+                    <div class="section-title">💰 Career Mode</div>
+                    <div class="grid grid-2">
+                        <div class="field">
+                            <label>Prize Money (Winner)</label>
+                            <input type="number" id="league-prize" value="0" step="1000000">
+                        </div>
+                        <div class="field">
+                            <label>Prize Drop % (per position)</label>
+                            <input type="number" id="league-prizedrop" value="5" min="1" max="50">
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="section">
+                    <div class="section-title">📅 Schedule</div>
+                    <div class="grid grid-4">
+                        <div class="field">
+                            <label>Start Month</label>
+                            <select id="league-startmonth">
+                                <option value="1">January</option>
+                                <option value="2">February</option>
+                                <option value="3">March</option>
+                                <option value="4">April</option>
+                                <option value="5">May</option>
+                                <option value="6">June</option>
+                                <option value="7">July</option>
+                                <option value="8" selected>August</option>
+                                <option value="9">September</option>
+                                <option value="10">October</option>
+                                <option value="11">November</option>
+                                <option value="12">December</option>
+                            </select>
+                        </div>
+                        <div class="field">
+                            <label>Start Day</label>
+                            <input type="number" id="league-startdayofmonth" value="15" min="1" max="31">
+                        </div>
+                        <div class="field">
+                            <label>Days Between Rounds</label>
+                            <input type="number" id="league-gap" value="7">
+                        </div>
+                        <div class="field">
+                            <label>Kickoff Time</label>
+                            <input type="number" id="league-kickoff" value="1500" step="100">
+                        </div>
+                    </div>
+                    <div class="grid grid-2" style="margin-top:10px">
+                        <div class="field">
+                            <label>Season Year</label>
+                            <input type="number" id="league-year" value="2025">
+                        </div>
+                        <div class="field">
+                            <label style="color:#8b949e">Calculated Start Day</label>
+                            <input type="text" id="league-calcday" readonly style="background:#21262d;color:#8b949e">
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="section">
+                    <div class="section-title">📊 Preview</div>
+                    <div id="league-preview" style="background:#0d1117;border:1px solid #30363d;border-radius:6px;padding:10px;font-family:monospace;font-size:0.7rem;max-height:300px;overflow-y:auto;">
+                        <span style="color:#8b949e">Select a league and click Preview</span>
+                    </div>
+                    <div style="display:flex;gap:8px;margin-top:12px">
+                        <button class="btn btn-secondary" onclick="previewLeague()">👁️ Preview</button>
+                        <button class="btn btn-primary" onclick="generateLeague()">⚽ Generate League</button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- CUP GENERATOR PAGE -->
+            <div id="page-cup" class="page">
+                <h1>🏆 Cup Generator</h1>
+                <p class="desc">Create knockout or group + knockout cup competitions</p>
+                
+                <div class="section">
+                    <div class="section-title">📍 Location</div>
+                    <div class="grid grid-3">
+                        <div class="field">
+                            <label>Parent Nation</label>
+                            <select id="cup-parent">
+                                <option value="">-- Select Nation --</option>
+                            </select>
+                        </div>
+                        <div class="field">
+                            <label>Code</label>
+                            <input type="text" id="cup-code" placeholder="C212">
+                        </div>
+                        <div class="field">
+                            <label>Asset ID</label>
+                            <input type="number" id="cup-assetid" placeholder="212">
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="section">
+                    <div class="section-title">🏆 Cup Type</div>
+                    <div class="grid grid-2">
+                        <div class="field">
+                            <label>Format</label>
+                            <select id="cup-type" onchange="onCupTypeChange()">
+                                <option value="knockout">Direct Knockout</option>
+                                <option value="groupko">Group Stage + Knockout</option>
+                            </select>
+                        </div>
+                        <div class="field">
+                            <label>Knockout Legs</label>
+                            <select id="cup-legs">
+                                <option value="2">Two Legs (Final: Single)</option>
+                                <option value="1">Single Leg (All Rounds)</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="section">
+                    <div class="section-title">👥 Teams</div>
+                    <div class="grid grid-2">
+                        <div class="field">
+                            <label>Filter by League</label>
+                            <select id="cup-team-source" onchange="loadTeamsForCup()">
+                                <option value="">-- All Teams --</option>
+                            </select>
+                        </div>
+                        <div class="field">
+                            <label>Search Teams</label>
+                            <input type="text" id="cup-team-search" placeholder="Type to filter..." oninput="filterCupTeams()">
+                        </div>
+                    </div>
+                    <div class="grid grid-2" style="margin-top:10px">
+                        <div class="field">
+                            <label>Available Teams</label>
+                            <select id="cup-teams-available" multiple style="height:200px;width:100%" ondblclick="addSelectedCupTeams()"></select>
+                            <button class="btn btn-secondary" style="margin-top:5px;width:100%" onclick="addSelectedCupTeams()">Add Selected →</button>
+                        </div>
+                        <div class="field">
+                            <label>Selected Teams <span id="cup-team-count" style="color:#58a6ff">(0)</span></label>
+                            <select id="cup-teams-list" multiple style="height:200px;width:100%" ondblclick="removeSelectedCupTeams()"></select>
+                            <button class="btn btn-secondary" style="margin-top:5px;width:100%" onclick="removeSelectedCupTeams()">← Remove Selected</button>
+                        </div>
+                    </div>
+                    <div style="display:flex;gap:8px;margin-top:8px">
+                        <button class="btn btn-secondary" onclick="addAllCupTeams()">Add All Filtered</button>
+                        <button class="btn btn-secondary" onclick="clearCupTeams()">Clear All</button>
+                        <div class="field" style="margin-left:auto">
+                            <label style="font-size:0.75rem">Fill Type</label>
+                            <select id="cup-filltype" style="width:auto">
+                                <option value="FillFromLeagueInOrder">Seeded</option>
+                                <option value="FillFromLeague">Random</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- DIRECT KNOCKOUT OPTIONS -->
+                <div id="cup-ko-options">
+                    <div class="section">
+                        <div class="section-title">⚔️ Knockout Format</div>
+                        <div class="grid grid-2">
+                            <div class="field">
+                                <label>Total Teams (power of 2)</label>
+                                <select id="cup-ko-teams">
+                                    <option value="8">8 teams (QF → F)</option>
+                                    <option value="16">16 teams (R16 → F)</option>
+                                    <option value="32" selected>32 teams (R32 → F)</option>
+                                    <option value="64">64 teams (R64 → F)</option>
+                                </select>
+                            </div>
+                            <div class="field">
+                                <label>Byes (top teams skip R1)</label>
+                                <input type="number" id="cup-byes" value="0" min="0" max="32">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- GROUP + KNOCKOUT OPTIONS -->
+                <div id="cup-group-options" style="display:none">
+                    <div class="section">
+                        <div class="section-title">📊 Group Stage</div>
+                        <div class="grid grid-3">
+                            <div class="field">
+                                <label>Teams Per Group</label>
+                                <select id="cup-teams-per-group" onchange="recalcCupGroups()">
+                                    <option value="3">3</option>
+                                    <option value="4" selected>4</option>
+                                    <option value="5">5</option>
+                                    <option value="6">6</option>
+                                </select>
+                            </div>
+                            <div class="field">
+                                <label>Number of Groups</label>
+                                <input type="number" id="cup-num-groups" value="8" min="2" max="16" onchange="recalcCupFromGroups()">
+                            </div>
+                            <div class="field">
+                                <label>Teams Advancing</label>
+                                <select id="cup-advance-per-group">
+                                    <option value="1">Top 1</option>
+                                    <option value="2" selected>Top 2</option>
+                                    <option value="3">Top 3</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="grid grid-2" style="margin-top:10px">
+                            <div class="field">
+                                <label>Group Rounds</label>
+                                <select id="cup-group-rounds">
+                                    <option value="1">Single Round-Robin</option>
+                                    <option value="2" selected>Home & Away</option>
+                                </select>
+                            </div>
+                            <div class="field">
+                                <label style="color:#8b949e">KO Teams (auto)</label>
+                                <input type="text" id="cup-ko-auto" readonly style="background:#21262d;color:#8b949e">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="section">
+                    <div class="section-title">💰 Prize Money</div>
+                    <div class="grid grid-4">
+                        <div class="field">
+                            <label>Winner</label>
+                            <input type="number" id="cup-prize-final" value="0" step="10000">
+                        </div>
+                        <div class="field">
+                            <label>Semi</label>
+                            <input type="number" id="cup-prize-semi" value="0" step="10000">
+                        </div>
+                        <div class="field">
+                            <label>Quarter</label>
+                            <input type="number" id="cup-prize-qf" value="0" step="10000">
+                        </div>
+                        <div class="field">
+                            <label>Group/Early</label>
+                            <input type="number" id="cup-prize-early" value="0" step="10000">
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="section">
+                    <div class="section-title">📅 Schedule</div>
+                    <div class="grid grid-4">
+                        <div class="field">
+                            <label>Start Month</label>
+                            <select id="cup-startmonth">
+                                <option value="1">January</option>
+                                <option value="2">February</option>
+                                <option value="3">March</option>
+                                <option value="4">April</option>
+                                <option value="5">May</option>
+                                <option value="6">June</option>
+                                <option value="7">July</option>
+                                <option value="8">August</option>
+                                <option value="9" selected>September</option>
+                                <option value="10">October</option>
+                                <option value="11">November</option>
+                                <option value="12">December</option>
+                            </select>
+                        </div>
+                        <div class="field">
+                            <label>Start Day</label>
+                            <input type="number" id="cup-startdayofmonth" value="15" min="1" max="31">
+                        </div>
+                        <div class="field">
+                            <label>Days Between Rounds</label>
+                            <input type="number" id="cup-gap" value="21">
+                        </div>
+                        <div class="field">
+                            <label>Kickoff Time</label>
+                            <input type="number" id="cup-kickoff" value="2000" step="100">
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="section">
+                    <div class="section-title">📊 Preview</div>
+                    <div id="cup-preview" style="background:#0d1117;border:1px solid #30363d;border-radius:6px;padding:10px;font-family:monospace;font-size:0.7rem;max-height:300px;overflow-y:auto;">
+                        <span style="color:#8b949e">Configure cup and click Preview</span>
+                    </div>
+                    <div style="display:flex;gap:8px;margin-top:12px">
+                        <button class="btn btn-secondary" onclick="previewCup()">👁️ Preview</button>
+                        <button class="btn btn-primary" onclick="generateCup()">🏆 Generate Cup</button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- CONTINENTAL CUP GENERATOR PAGE -->
+            <div id="page-clubchamp" class="page">
+                <h1>🏆 Continental Cup Generator</h1>
+                <p class="desc">Create AFC/CAF/CONCACAF/CONMEBOL-style continental club competitions (groups → KO)</p>
+                
+                <div class="section">
+                    <div class="section-title">⚙️ Basic Setup</div>
+                    <div class="grid grid-3">
+                        <div class="field">
+                            <label>Parent Confederation</label>
+                            <select id="cont-parent" onchange="contUpdateLeagueOptions()">
+                                <option value="">-- Select --</option>
+                            </select>
+                        </div>
+                        <div class="field">
+                            <label>Code</label>
+                            <input type="text" id="cont-code" placeholder="C3005">
+                        </div>
+                        <div class="field">
+                            <label>Asset ID</label>
+                            <input type="number" id="cont-asset" placeholder="3005">
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="section">
+                    <div class="section-title">🏟️ Format</div>
+                    <div class="grid grid-4">
+                        <div class="field">
+                            <label>Number of Teams</label>
+                            <select id="cont-teams" onchange="contUpdateGroupCalc()">
+                                <option value="16" selected>16</option>
+                                <option value="24">24</option>
+                                <option value="32">32</option>
+                            </select>
+                        </div>
+                        <div class="field">
+                            <label>Number of Groups</label>
+                            <select id="cont-numgroups" onchange="contUpdateGroupCalc()">
+                                <option value="2">2</option>
+                                <option value="4" selected>4</option>
+                                <option value="6">6</option>
+                                <option value="8">8</option>
+                            </select>
+                        </div>
+                        <div class="field">
+                            <label>Teams Per Group</label>
+                            <input type="text" id="cont-tpg" readonly value="4" style="background:#21262d">
+                        </div>
+                        <div class="field">
+                            <label>Advance Per Group</label>
+                            <input type="number" id="cont-advance" value="2" min="1" max="4">
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="section">
+                    <div class="section-title">📅 Schedule</div>
+                    <div class="grid grid-4">
+                        <div class="field">
+                            <label>Start Month</label>
+                            <select id="cont-startmonth">
+                                <option value="1">January</option>
+                                <option value="2" selected>February</option>
+                                <option value="3">March</option>
+                                <option value="4">April</option>
+                                <option value="5">May</option>
+                                <option value="6">June</option>
+                                <option value="7">July</option>
+                                <option value="8">August</option>
+                                <option value="9">September</option>
+                                <option value="10">October</option>
+                                <option value="11">November</option>
+                                <option value="12">December</option>
+                            </select>
+                        </div>
+                        <div class="field">
+                            <label>Start Day</label>
+                            <input type="number" id="cont-startday" value="15" min="1" max="31">
+                        </div>
+                        <div class="field">
+                            <label>Days Between Rounds</label>
+                            <input type="number" id="cont-gap" value="14" min="1">
+                        </div>
+                        <div class="field">
+                            <label>Match Importance</label>
+                            <input type="number" id="cont-importance" value="80" min="1" max="100">
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="section">
+                    <div class="section-title">📥 Team Sources</div>
+                    <p style="font-size:0.75rem;color:#8b949e;margin-bottom:8px">
+                        Add rows to define where teams come from. Total team count must equal the number of teams above.
+                    </p>
+                    <div id="cont-sources-list"></div>
+                    <div style="display:flex;gap:8px;margin-top:8px">
+                        <button class="btn btn-secondary" onclick="contAddSourceRow('league')">➕ Add League Source</button>
+                        <button class="btn btn-secondary" onclick="contAddSourceRow('comp')">➕ Add Feeder Comp</button>
+                        <span id="cont-source-total" style="margin-left:auto;color:#58a6ff;font-size:0.8rem;align-self:center">Total: 0 / 0</span>
+                    </div>
+                </div>
+                
+                <div class="section">
+                    <div class="section-title">💰 Prize Money (optional)</div>
+                    <div class="grid grid-2">
+                        <div class="field">
+                            <label>Total Prize Pool</label>
+                            <input type="number" id="cont-prize" value="0">
+                        </div>
+                        <div class="field">
+                            <label>Prize Drop %</label>
+                            <input type="number" id="cont-prize-drop" value="50">
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="section">
+                    <div style="display:flex;gap:8px">
+                        <button class="btn btn-primary" onclick="generateContinentalCup()">🏆 Generate Continental Cup</button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- INTERNATIONAL GENERATOR PAGE -->
+            <div id="page-international" class="page">
+                <h1>🌍 International Generator</h1>
+                <p class="desc">Create international tournaments (INTERCUP, INTERQUAL)</p>
+                
+                <div class="section">
+                    <div class="section-title">📍 Location & Type</div>
+                    <div class="grid grid-3">
+                        <div class="field">
+                            <label>Parent Confederation</label>
+                            <select id="intl-parent" onchange="loadNationsForIntl()">
+                                <option value="0">🌐 World (parent=0)</option>
+                                <option value="1">UEFA</option>
+                                <option value="1600">CONMEBOL</option>
+                                <option value="1531">AFC</option>
+                                <option value="1443">CONCACAF</option>
+                                <option value="1774">CAF</option>
+                                <option value="1775">OFC</option>
+                            </select>
+                        </div>
+                        <div class="field">
+                            <label>Code</label>
+                            <input type="text" id="intl-code" placeholder="C980" value="C980">
+                        </div>
+                        <div class="field">
+                            <label>Asset ID</label>
+                            <input type="number" id="intl-assetid" placeholder="980" value="980">
+                        </div>
+                    </div>
+                    <div class="grid grid-2" style="margin-top:10px">
+                        <div class="field">
+                            <label>Tournament Type</label>
+                            <select id="intl-type" onchange="onIntlTypeChange()">
+                                <option value="INTERCUP">INTERCUP (Groups + KO)</option>
+                                <option value="INTERQUAL">INTERQUAL (Qualifiers Only)</option>
+                                <option value="INTERQUAL_KO">INTERQUAL + KO (Qualifiers + Playoffs)</option>
+                                <option value="CHAMPIONSLEAGUE">CHAMPIONSLEAGUE (Club - Swiss/League Phase)</option>
+                            </select>
+                        </div>
+                        <div class="field">
+                            <label>Year Cycle</label>
+                            <select id="intl-year-offset">
+                                <option value="1" selected>Every Year</option>
+                                <option value="2">Every 2 Years</option>
+                                <option value="4">Every 4 Years</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- CHAMPIONSLEAGUE Options (Club competitions with Swiss format) -->
+                <div id="championsleague-options" style="display:none">
+                    <div class="section">
+                        <div class="section-title">⚙️ Preset / Entry Method</div>
+                        <div class="grid grid-2">
+                            <div class="field">
+                                <label>Preset</label>
+                                <select id="cl-preset" onchange="onCLPresetChange()">
+                                    <option value="custom">Custom Configuration</option>
+                                    <option value="ucl">UCL (36 teams, 8 games)</option>
+                                    <option value="uel">UEL (36 teams, 8 games)</option>
+                                    <option value="uecl">UECL (36 teams, 6 games)</option>
+                                    <option value="acl">ACL Elite (24 teams, 8 games)</option>
+                                </select>
+                            </div>
+                            <div class="field">
+                                <label>Team Entry Method</label>
+                                <select id="cl-entry-method" onchange="onCLEntryMethodChange()">
+                                    <option value="coefficient">By Country Coefficient (UEFA style)</option>
+                                    <option value="league">From Specific Leagues (CAF/AFC style)</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Coefficient Entry -->
+                    <div id="cl-coefficient-entry" class="section">
+                        <div class="section-title">🏆 Teams by Country Coefficient</div>
+                        <p style="color:#8b949e;font-size:12px;margin-bottom:10px">Define how many teams each country rank sends. Higher ranked countries send more teams.</p>
+                        <div id="cl-coefficient-rows">
+                            <!-- Dynamic rows added here -->
+                        </div>
+                        <button class="btn btn-secondary" onclick="addCLCoefficientRow()">+ Add Row</button>
+                        <div style="margin-top:10px;padding:8px;background:#21262d;border-radius:4px">
+                            <span style="color:#8b949e">Total Teams from Coefficient: </span>
+                            <span id="cl-coef-total" style="color:#58a6ff;font-weight:bold">0</span>
+                        </div>
+                    </div>
+                    
+                    <!-- League Entry -->
+                    <div id="cl-league-entry" class="section" style="display:none">
+                        <div class="section-title">🏟️ Teams from Leagues</div>
+                        <div class="grid grid-2">
+                            <div class="field">
+                                <label>Search Leagues</label>
+                                <input type="text" id="cl-league-search" placeholder="Search..." oninput="filterCLLeagues()">
+                            </div>
+                            <div class="field">
+                                <label>Filter by Nation</label>
+                                <select id="cl-league-nation-filter" onchange="filterCLLeagues()">
+                                    <option value="">All Nations</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="grid grid-2" style="margin-top:10px">
+                            <div class="field">
+                                <label>Available Leagues</label>
+                                <select id="cl-leagues-available" multiple style="height:150px;width:100%"></select>
+                                <div style="display:flex;gap:5px;margin-top:5px">
+                                    <input type="number" id="cl-league-teams" value="1" min="1" max="10" style="width:60px">
+                                    <button class="btn btn-secondary" style="flex:1" onclick="addCLLeague()">Add with X teams →</button>
+                                </div>
+                            </div>
+                            <div class="field">
+                                <label>Selected Leagues <span id="cl-league-count" style="color:#58a6ff">(0 teams)</span></label>
+                                <select id="cl-leagues-list" multiple style="height:150px;width:100%"></select>
+                                <button class="btn btn-secondary" style="margin-top:5px;width:100%" onclick="removeCLLeague()">← Remove Selected</button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Title Holder -->
+                    <div class="section">
+                        <div class="section-title">🏅 Title Holder Entry</div>
+                        <div class="grid grid-2">
+                            <div class="field">
+                                <label>Title Holder Comp (for FillFromCompTable)</label>
+                                <input type="number" id="cl-titleholder-comp" value="0" min="0" placeholder="Comp ID (0 = none)">
+                            </div>
+                            <div class="field">
+                                <label>UEL Winner Entry (UCL only)</label>
+                                <input type="number" id="cl-uel-winner-comp" value="0" min="0" placeholder="Comp ID (0 = none)">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Qualifying Rounds -->
+                    <div class="section">
+                        <div class="section-title">🎯 Qualifying Rounds</div>
+                        <div class="grid grid-3">
+                            <div class="field">
+                                <label>Number of Qualifying Rounds</label>
+                                <select id="cl-qual-rounds" onchange="updateCLQualConfig()">
+                                    <option value="0">0 (Direct to League Phase)</option>
+                                    <option value="1">1 Round</option>
+                                    <option value="2" selected>2 Rounds</option>
+                                    <option value="3">3 Rounds</option>
+                                    <option value="4">4 Rounds</option>
+                                </select>
+                            </div>
+                            <div class="field">
+                                <label>Qualifying Format</label>
+                                <select id="cl-qual-format">
+                                    <option value="KO2LEGS" selected>Two Legs</option>
+                                    <option value="KO1LEG">Single Leg</option>
+                                </select>
+                            </div>
+                            <div class="field">
+                                <label>Seeded Draw</label>
+                                <select id="cl-qual-seeded">
+                                    <option value="1" selected>Yes (by coefficient)</option>
+                                    <option value="0">No (random)</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div id="cl-qual-teams-config" style="margin-top:10px">
+                            <!-- Dynamic qualifying round team counts -->
+                        </div>
+                    </div>
+                    
+                    <!-- League Phase (Swiss System) -->
+                    <div class="section">
+                        <div class="section-title">📊 League Phase (Swiss System)</div>
+                        <div class="grid grid-3">
+                            <div class="field">
+                                <label>Teams in League Phase</label>
+                                <select id="cl-league-phase-teams" onchange="updateCLLeaguePhase()">
+                                    <option value="24">24 Teams</option>
+                                    <option value="32">32 Teams</option>
+                                    <option value="36" selected>36 Teams</option>
+                                    <option value="40">40 Teams</option>
+                                </select>
+                            </div>
+                            <div class="field">
+                                <label>Games per Team</label>
+                                <select id="cl-league-phase-games">
+                                    <option value="6">6 Games</option>
+                                    <option value="8" selected>8 Games</option>
+                                    <option value="10">10 Games</option>
+                                </select>
+                            </div>
+                            <div class="field">
+                                <label>Matchup Behavior</label>
+                                <select id="cl-matchup-behavior">
+                                    <option value="UEFA" selected>UEFA (Swiss seeding)</option>
+                                    <option value="BASIC">BASIC (Random)</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="grid grid-3" style="margin-top:10px">
+                            <div class="field">
+                                <label>Direct to R16 (positions)</label>
+                                <input type="text" id="cl-direct-advance" value="1-8" placeholder="e.g., 1-8">
+                            </div>
+                            <div class="field">
+                                <label>To KO Playoffs (positions)</label>
+                                <input type="text" id="cl-playoff-positions" value="9-24" placeholder="e.g., 9-24">
+                            </div>
+                            <div class="field">
+                                <label>Eliminated (positions)</label>
+                                <input type="text" id="cl-eliminated" value="25-36" readonly style="background:#21262d">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- KO Playoff -->
+                    <div class="section">
+                        <div class="section-title">⚔️ Knockout Playoff Round</div>
+                        <div class="grid grid-3">
+                            <div class="field">
+                                <label>KO Playoff Format</label>
+                                <select id="cl-ko-playoff-format">
+                                    <option value="KO2LEGS" selected>Two Legs</option>
+                                    <option value="KO1LEG">Single Leg</option>
+                                </select>
+                            </div>
+                            <div class="field">
+                                <label>Seeding Style</label>
+                                <select id="cl-ko-playoff-seeding">
+                                    <option value="bracket" selected>Bracket (9/10 vs 23/24)</option>
+                                    <option value="random">Random Draw</option>
+                                </select>
+                            </div>
+                            <div class="field">
+                                <label>Number of Ties</label>
+                                <input type="number" id="cl-ko-playoff-ties" value="8" readonly style="background:#21262d">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Final KO Rounds -->
+                    <div class="section">
+                        <div class="section-title">🏆 Final Knockout Rounds</div>
+                        <div class="grid grid-3">
+                            <div class="field">
+                                <label>R16 Format</label>
+                                <select id="cl-r16-format">
+                                    <option value="KO2LEGS" selected>Two Legs</option>
+                                    <option value="KO1LEG">Single Leg</option>
+                                </select>
+                            </div>
+                            <div class="field">
+                                <label>QF/SF Format</label>
+                                <select id="cl-qfsf-format">
+                                    <option value="KO2LEGS" selected>Two Legs</option>
+                                    <option value="KO1LEG">Single Leg</option>
+                                </select>
+                            </div>
+                            <div class="field">
+                                <label>Final Format</label>
+                                <select id="cl-final-format">
+                                    <option value="KO1LEG" selected>Single Match</option>
+                                    <option value="KO2LEGS">Two Legs</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="grid grid-2" style="margin-top:10px">
+                            <div class="field">
+                                <label>Draw Before Each Round</label>
+                                <select id="cl-draw-stages">
+                                    <option value="all" selected>All Rounds (R16, QF, SF)</option>
+                                    <option value="r16only">R16 Only</option>
+                                    <option value="none">No Draw Stages</option>
+                                </select>
+                            </div>
+                            <div class="field">
+                                <label>QF/SF Draw Type</label>
+                                <select id="cl-qfsf-draw">
+                                    <option value="random" selected>Random</option>
+                                    <option value="seeded">Seeded</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Schedule -->
+                    <div class="section">
+                        <div class="section-title">📅 Schedule</div>
+                        <div class="grid grid-3">
+                            <div class="field">
+                                <label>League Phase Start Day</label>
+                                <input type="number" id="cl-start-day" value="261" min="1" max="730">
+                            </div>
+                            <div class="field">
+                                <label>Kickoff Time</label>
+                                <input type="number" id="cl-kickoff" value="2000" min="0" max="2359">
+                            </div>
+                            <div class="field">
+                                <label>Early Kickoff Time</label>
+                                <input type="number" id="cl-early-kickoff" value="1755" min="0" max="2359">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="section">
+                    <div class="section-title">🏳️ Nations (Men's National Teams Only)</div>
+                    <div class="grid grid-3">
+                        <div class="field">
+                            <label>Search</label>
+                            <input type="text" id="intl-nation-search" placeholder="Search nations..." oninput="filterIntlNations()">
+                        </div>
+                        <div class="field">
+                            <label>Filter by Confederation</label>
+                            <select id="intl-confed-filter" onchange="filterIntlNations()">
+                                <option value="">All Confederations</option>
+                                <option value="UEFA">UEFA (Europe)</option>
+                                <option value="CONMEBOL">CONMEBOL (S. America)</option>
+                                <option value="AFC">AFC (Asia)</option>
+                                <option value="CONCACAF">CONCACAF (N. America)</option>
+                                <option value="CAF">CAF (Africa)</option>
+                                <option value="OFC">OFC (Oceania)</option>
+                            </select>
+                        </div>
+                        <div class="field">
+                            <label>Quick Load</label>
+                            <select id="intl-nation-preset" onchange="loadIntlPreset()">
+                                <option value="">-- Presets --</option>
+                                <option value="uefa16">UEFA 16 Nations</option>
+                                <option value="uefa24">UEFA 24 Nations</option>
+                                <option value="conmebol10">CONMEBOL 10 Nations</option>
+                                <option value="afc24">AFC 24 Nations</option>
+                                <option value="caf24">CAF 24 Nations</option>
+                                <option value="concacaf16">CONCACAF 16 Nations</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="grid grid-2" style="margin-top:10px">
+                        <div class="field">
+                            <label>Available Nations</label>
+                            <select id="intl-nations-available" multiple style="height:180px;width:100%" ondblclick="addSelectedIntlNations()"></select>
+                            <button class="btn btn-secondary" style="margin-top:5px;width:100%" onclick="addSelectedIntlNations()">Add Selected →</button>
+                        </div>
+                        <div class="field">
+                            <label>Selected Nations <span id="intl-nation-count" style="color:#58a6ff">(0)</span></label>
+                            <select id="intl-nations-list" multiple style="height:180px;width:100%" ondblclick="removeSelectedIntlNations()"></select>
+                            <button class="btn btn-secondary" style="margin-top:5px;width:100%" onclick="removeSelectedIntlNations()">← Remove Selected</button>
+                        </div>
+                    </div>
+                    <div style="display:flex;gap:8px;margin-top:8px">
+                        <button class="btn btn-secondary" onclick="addAllIntlNations()">Add All</button>
+                        <button class="btn btn-secondary" onclick="clearIntlNations()">Clear All</button>
+                    </div>
+                    <div class="field" style="margin-top:10px">
+                        <label>
+                            <input type="checkbox" id="intl-fill-teams" checked>
+                            Fill teams with selection (uncheck to leave empty for FillFromCompTable)
+                        </label>
+                    </div>
+                </div>
+                
+                <!-- INTERQUAL_KO Mode Selection - shown first -->
+                <div id="intl-mode-selection" style="display:none">
+                    <div class="section">
+                        <div class="section-title">🎯 Tournament Structure</div>
+                        <div class="field">
+                            <label>
+                                <input type="radio" name="intl-qual-mode" value="simple" checked onchange="onQualModeChange()">
+                                <strong>Simple Qualifiers:</strong> Groups → Playoffs (e.g. Nations League playoffs)
+                            </label>
+                        </div>
+                        <div class="field" style="margin-top:8px">
+                            <label>
+                                <input type="radio" name="intl-qual-mode" value="worldcup" onchange="onQualModeChange()">
+                                <strong>Qualifiers + Finals:</strong> Qualifier groups → Final tournament groups → Knockout (e.g. Euro Qualifiers, World Cup)
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Simple mode: Regular Group Stage -->
+                <div id="intl-regular-group-options" class="section">
+                    <div class="section-title">📊 Qualifier Groups</div>
+                    <div class="grid grid-4">
+                        <div class="field">
+                            <label>Number of Groups</label>
+                            <select id="intl-num-groups" onchange="recalcIntlStructure()">
+                                <option value="4">4 Groups</option>
+                                <option value="6">6 Groups</option>
+                                <option value="8">8 Groups</option>
+                                <option value="12">12 Groups</option>
+                            </select>
+                        </div>
+                        <div class="field">
+                            <label>Teams per Group</label>
+                            <select id="intl-teams-per-group" onchange="recalcIntlStructure()">
+                                <option value="3">3</option>
+                                <option value="4" selected>4</option>
+                                <option value="5">5</option>
+                                <option value="6">6</option>
+                            </select>
+                        </div>
+                        <div class="field">
+                            <label>Group Format</label>
+                            <select id="intl-group-format">
+                                <option value="1">Single Round-Robin</option>
+                                <option value="2">Home & Away</option>
+                            </select>
+                        </div>
+                        <div class="field">
+                            <label>Teams Advancing</label>
+                            <select id="intl-advance-per-group" onchange="onAdvanceChange()">
+                                <option value="1">Top 1</option>
+                                <option value="2" selected>Top 2</option>
+                                <option value="3">Top 3</option>
+                                <option value="4">Top 4</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="grid grid-2" style="margin-top:10px">
+                        <div class="field">
+                            <label>
+                                <input type="checkbox" id="intl-best-third" onchange="onBestThirdChange()">
+                                Also advance best 3rd place teams
+                            </label>
+                        </div>
+                        <div class="field" id="intl-best-third-count" style="display:none">
+                            <label>How many best 3rd?</label>
+                            <select id="intl-best-third-num" onchange="recalcIntlStructure()">
+                                <option value="4" selected>Best 4 of 3rd place</option>
+                                <option value="6">Best 6 of 3rd place</option>
+                                <option value="8">Best 8 of 3rd place</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="field" style="margin-top:10px">
+                        <label style="color:#8b949e">Structure: <span id="intl-structure-info">-</span></label>
+                    </div>
+                </div>
+                
+                <!-- Qualifiers + Finals Mode -->
+                <div id="intl-worldcup-options" style="display:none">
+                    <div class="section">
+                        <div class="section-title">📊 Qualifier Stage(s)</div>
+                        <p style="font-size:0.7rem;color:#8b949e;margin-bottom:8px">Add one entry per confederation. For Euro Qualifiers, add just UEFA. For World Cup, add all confederations.</p>
+                        <div style="background:#21262d;padding:10px;border-radius:6px;margin-bottom:10px">
+                            <div style="display:grid;grid-template-columns:1fr 60px 45px 45px 45px 45px 45px 24px;gap:4px;font-size:0.65rem;color:#8b949e;margin-bottom:8px;padding-left:8px">
+                                <span>Confederation</span>
+                                <span>Asset ID</span>
+                                <span>Groups</span>
+                                <span>Teams</span>
+                                <span>Adv</span>
+                                <span>3rd</span>
+                                <span>Total</span>
+                                <span></span>
+                            </div>
+                            <div id="intl-confed-slots"></div>
+                            <button type="button" onclick="addConfedSlot()" style="margin-top:8px;padding:4px 8px;font-size:0.7rem">+ Add Qualifier Stage</button>
+                        </div>
+                        <div class="field" style="color:#8b949e;font-size:0.75rem">
+                            Total qualifying slots: <span id="intl-total-qual-slots">0</span>
+                        </div>
+                    </div>
+                    
+                    <div class="section">
+                        <div class="section-title">🏆 Final Tournament</div>
+                        <div class="grid grid-5">
+                            <div class="field">
+                                <label>Final Asset ID</label>
+                                <input type="number" id="intl-final-assetid" value="980" min="1" style="width:100%">
+                            </div>
+                            <div class="field">
+                                <label>Final Groups</label>
+                                <select id="intl-final-num-groups" onchange="recalcIntlStructure()">
+                                    <option value="4">4 Groups</option>
+                                    <option value="6">6 Groups</option>
+                                    <option value="8" selected>8 Groups</option>
+                                    <option value="12">12 Groups</option>
+                                    <option value="16">16 Groups</option>
+                                </select>
+                            </div>
+                            <div class="field">
+                                <label>Teams/Group</label>
+                                <select id="intl-final-teams-per-group" onchange="recalcIntlStructure()">
+                                    <option value="3">3</option>
+                                    <option value="4" selected>4</option>
+                                    <option value="5">5</option>
+                                    <option value="6">6</option>
+                                </select>
+                            </div>
+                            <div class="field">
+                                <label>Format</label>
+                                <select id="intl-final-group-format">
+                                    <option value="1" selected>Single RR</option>
+                                    <option value="2">Home & Away</option>
+                                </select>
+                            </div>
+                            <div class="field">
+                                <label>Advance</label>
+                                <select id="intl-final-advance" onchange="recalcIntlStructure()">
+                                    <option value="2" selected>Top 2</option>
+                                    <option value="1">Top 1</option>
+                                    <option value="3">Top 3</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="grid grid-2" style="margin-top:8px">
+                            <div class="field">
+                                <label>
+                                    <input type="checkbox" id="intl-final-best3rd" onchange="onFinalBest3rdChange()">
+                                    Also advance best 3rd place teams
+                                </label>
+                            </div>
+                            <div class="field" id="intl-final-best3rd-count" style="display:none">
+                                <label>How many best 3rd?</label>
+                                <select id="intl-final-best3rd-num" onchange="recalcIntlStructure()">
+                                    <option value="4">Best 4</option>
+                                    <option value="6">Best 6</option>
+                                    <option value="8" selected>Best 8</option>
+                                    <option value="12">Best 12</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="field" style="margin-top:8px;color:#8b949e;font-size:0.75rem">
+                            Final tournament teams: <span id="intl-final-teams-needed">32</span> | 
+                            Advancing to KO: <span id="intl-final-advancing">16</span> → 
+                            <span id="intl-final-ko-bracket">R16</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- KO Stage Options (for INTERCUP and INTERQUAL_KO) -->
+                <div id="intl-ko-options">
+                    <div class="section">
+                        <div class="section-title">⚔️ Knockout Stage</div>
+                        <div class="grid grid-3">
+                            <div class="field">
+                                <label>KO Format</label>
+                                <select id="intl-ko-format">
+                                    <option value="KO1LEG" selected>Single Match (hosted)</option>
+                                    <option value="KO2LEGS">Two Legs (home/away)</option>
+                                </select>
+                            </div>
+                            <div class="field" id="intl-ko-teams-field">
+                                <label style="color:#8b949e">KO Teams (auto)</label>
+                                <input type="text" id="intl-ko-teams" readonly style="background:#21262d;color:#8b949e">
+                            </div>
+                            <div class="field" id="intl-ko-rounds-field">
+                                <label style="color:#8b949e">KO Rounds</label>
+                                <input type="text" id="intl-ko-rounds" readonly style="background:#21262d;color:#8b949e">
+                            </div>
+                        </div>
+                        <div class="field" style="margin-top:8px">
+                            <label>
+                                <input type="checkbox" id="intl-third-place-match">
+                                Include Third Place Match (SF losers play for 3rd)
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="section">
+                    <div class="section-title">📅 Schedule</div>
+                    <div class="grid grid-3">
+                        <div class="field">
+                            <label>Schedule Mode</label>
+                            <select id="intl-schedule-mode" onchange="onIntlScheduleModeChange()">
+                                <option value="hosted">Hosted (compact 2-3 weeks)</option>
+                                <option value="windows">International Windows</option>
+                                <option value="reference">Use Reference Comp</option>
+                            </select>
+                        </div>
+                        <div class="field">
+                            <label>Start Month</label>
+                            <select id="intl-startmonth">
+                                <option value="JAN">January</option>
+                                <option value="FEB">February</option>
+                                <option value="MAR">March</option>
+                                <option value="APR">April</option>
+                                <option value="MAY">May</option>
+                                <option value="JUN" selected>June</option>
+                                <option value="JUL">July</option>
+                                <option value="AUG">August</option>
+                                <option value="SEP">September</option>
+                                <option value="OCT">October</option>
+                                <option value="NOV">November</option>
+                                <option value="DEC">December</option>
+                            </select>
+                        </div>
+                        <div class="field">
+                            <label>Start Year</label>
+                            <input type="number" id="intl-startyear" value="2028">
+                        </div>
+                    </div>
+                    <!-- Hosted mode options -->
+                    <div id="intl-hosted-opts" class="grid grid-3" style="margin-top:10px">
+                        <div class="field">
+                            <label>Start Day of Year</label>
+                            <input type="number" id="intl-startday" value="165" min="1" max="365">
+                        </div>
+                        <div class="field">
+                            <label>Days Between Rounds</label>
+                            <input type="number" id="intl-gap" value="4">
+                        </div>
+                        <div class="field">
+                            <label>Kickoff Time</label>
+                            <input type="number" id="intl-kickoff" value="2000" min="1200" max="2200">
+                        </div>
+                    </div>
+                    <!-- Reference comp options -->
+                    <div id="intl-reference-opts" class="grid grid-2" style="margin-top:10px;display:none">
+                        <div class="field">
+                            <label>Reference Comp ID</label>
+                            <input type="number" id="intl-usedatescomp" value="1778" placeholder="e.g. 1778">
+                        </div>
+                        <div class="field">
+                            <label style="color:#8b949e">Common References</label>
+                            <span style="color:#8b949e;font-size:0.7rem">1778 = Int'l Friendlies</span>
+                        </div>
+                    </div>
+                    <!-- International windows info -->
+                    <div id="intl-windows-opts" style="margin-top:10px;display:none">
+                        <div style="color:#8b949e;font-size:0.7rem;background:#21262d;padding:8px;border-radius:4px">
+                            <strong>International Windows:</strong><br>
+                            September: Days 250-260 | October: Days 285-295 | November: Days 320-330<br>
+                            March: Days 450-460 | June: Days 520-540 | Next September: Days 615-625
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="section">
+                    <div class="section-title">📊 Preview</div>
+                    <div id="intl-preview" style="background:#0d1117;border:1px solid #30363d;border-radius:6px;padding:10px;font-family:monospace;font-size:0.7rem;max-height:300px;overflow-y:auto;">
+                        <span style="color:#8b949e">Configure tournament and click Preview</span>
+                    </div>
+                    <div style="display:flex;gap:8px;margin-top:12px">
+                        <button class="btn btn-secondary" onclick="previewIntl()">👁️ Preview</button>
+                        <button class="btn btn-primary" onclick="generateIntl()">🌍 Generate International</button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- EXPAND COMPETITION PAGE -->
+            <div id="page-expandcomp" class="page">
+                <h1>📈 Expand Competition</h1>
+                <p class="desc">Add more teams, rounds, or groups to an existing competition</p>
+                
+                <div class="section">
+                    <div class="section-title">🎯 Select Competition</div>
+                    <div class="grid grid-2">
+                        <div class="field">
+                            <label>Filter by Parent</label>
+                            <select id="exp-parent-filter" onchange="filterExpandCompList()">
+                                <option value="">-- All --</option>
+                            </select>
+                        </div>
+                        <div class="field">
+                            <label>Search</label>
+                            <input type="text" id="exp-search" placeholder="Search by code or name..." oninput="filterExpandCompList()">
+                        </div>
+                    </div>
+                    <div class="field" style="margin-top:12px">
+                        <label>Competition</label>
+                        <select id="exp-comp-select" size="8" style="height:200px" onchange="loadCompForExpand()">
+                            <option value="">-- Load compdata first --</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="section">
+                    <div class="section-title">📊 Current Structure</div>
+                    <div id="exp-current-info" style="background:#0d1117;border:1px solid #30363d;border-radius:6px;padding:10px;font-family:monospace;font-size:0.75rem;min-height:80px;">
+                        <span style="color:#8b949e">Select a competition to see its structure</span>
+                    </div>
+                </div>
+                
+                <div id="exp-options-section" style="display:none">
+                    <div class="section">
+                        <div class="section-title">⚙️ Expansion Options</div>
+                        
+                        <!-- League Options -->
+                        <div id="exp-league-options" style="display:none">
+                            <div class="grid grid-3">
+                                <div class="field">
+                                    <label>Current Teams</label>
+                                    <input type="number" id="exp-league-current" readonly style="background:#21262d">
+                                </div>
+                                <div class="field">
+                                    <label>New Team Count</label>
+                                    <input type="number" id="exp-league-new" min="2" max="40" value="20" onchange="previewExpand()">
+                                </div>
+                                <div class="field">
+                                    <label>Games vs Each (H+A)</label>
+                                    <select id="exp-league-games" onchange="previewExpand()">
+                                        <option value="2">2 (Home+Away)</option>
+                                        <option value="3">3</option>
+                                        <option value="4">4</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Cup Options -->
+                        <div id="exp-cup-options" style="display:none">
+                            <div class="grid grid-3">
+                                <div class="field">
+                                    <label>Current Teams</label>
+                                    <input type="number" id="exp-cup-current" readonly style="background:#21262d">
+                                </div>
+                                <div class="field">
+                                    <label>New Team Count</label>
+                                    <select id="exp-cup-new" onchange="previewExpand()">
+                                        <option value="16">16</option>
+                                        <option value="32">32</option>
+                                        <option value="64">64</option>
+                                        <option value="128">128</option>
+                                    </select>
+                                </div>
+                                <div class="field">
+                                    <label>New Round Format</label>
+                                    <select id="exp-cup-format">
+                                        <option value="KO1LEG">1 Leg</option>
+                                        <option value="KO2LEGS">2 Legs</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Group + KO Options (International/Group Cups) -->
+                        <div id="exp-group-options" style="display:none">
+                            <div class="grid grid-4">
+                                <div class="field">
+                                    <label>Current Teams</label>
+                                    <input type="number" id="exp-group-current" readonly style="background:#21262d">
+                                </div>
+                                <div class="field">
+                                    <label>New Total Teams</label>
+                                    <input type="number" id="exp-group-new" min="8" max="64" value="32" onchange="calcExpandGroups()">
+                                </div>
+                                <div class="field">
+                                    <label>Teams per Group</label>
+                                    <select id="exp-group-size" onchange="calcExpandGroups()">
+                                        <option value="3">3</option>
+                                        <option value="4" selected>4</option>
+                                        <option value="5">5</option>
+                                        <option value="6">6</option>
+                                    </select>
+                                </div>
+                                <div class="field">
+                                    <label>Number of Groups</label>
+                                    <input type="number" id="exp-group-count" readonly style="background:#21262d">
+                                </div>
+                            </div>
+                            <div class="grid grid-3" style="margin-top:12px">
+                                <div class="field">
+                                    <label>Advance per Group</label>
+                                    <select id="exp-group-advance" onchange="calcExpandKO()">
+                                        <option value="1">Top 1</option>
+                                        <option value="2" selected>Top 2</option>
+                                        <option value="3">Top 3</option>
+                                    </select>
+                                </div>
+                                <div class="field">
+                                    <label>Best 3rd Places</label>
+                                    <input type="number" id="exp-group-best3rd" min="0" max="16" value="0" onchange="calcExpandKO()">
+                                </div>
+                                <div class="field">
+                                    <label>KO Bracket Size</label>
+                                    <input type="number" id="exp-group-ko" readonly style="background:#21262d">
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Friendly Options (standings only) -->
+                        <div id="exp-friendly-options" style="display:none">
+                            <div class="grid grid-4">
+                                <div class="field">
+                                    <label>Current Standings</label>
+                                    <input type="number" id="exp-friendly-current" readonly style="background:#21262d">
+                                </div>
+                                <div class="field">
+                                    <label>Teams in League DB</label>
+                                    <input type="number" id="exp-friendly-dbteams" readonly style="background:#21262d">
+                                </div>
+                                <div class="field">
+                                    <label>Teams to Add</label>
+                                    <input type="number" id="exp-friendly-toadd" readonly style="background:#21262d">
+                                </div>
+                                <div class="field">
+                                    <label>New Total</label>
+                                    <input type="number" id="exp-friendly-new" readonly style="background:#21262d">
+                                </div>
+                            </div>
+                            <div style="margin-top:12px;font-size:0.8rem;color:#8b949e">
+                                This will add standings slots and update schedule to match team count from leagueteamlinks.
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="section">
+                        <div class="section-title">👥 New Team Source</div>
+                        <div class="grid grid-2">
+                            <div class="field">
+                                <label>Fill Method</label>
+                                <select id="exp-fill-method" onchange="toggleExpandFillMethod()">
+                                    <option value="empty">Leave Empty (Manual Fill)</option>
+                                    <option value="league">From League</option>
+                                    <option value="individual">Individual Teams</option>
+                                </select>
+                            </div>
+                            <div class="field" id="exp-fill-league-field" style="display:none">
+                                <label>Select League</label>
+                                <select id="exp-fill-league">
+                                    <option value="">-- Select League --</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div id="exp-fill-individual-field" style="display:none;margin-top:12px">
+                            <div class="field" id="exp-confed-filter-field" style="display:none;margin-bottom:12px">
+                                <label>Filter by Confederation</label>
+                                <select id="exp-confed-filter" onchange="filterExpandTeamsByConfed()">
+                                    <option value="">-- All Confederations --</option>
+                                    <option value="UEFA">UEFA (Europe)</option>
+                                    <option value="CONMEBOL">CONMEBOL (South America)</option>
+                                    <option value="CAF">CAF (Africa)</option>
+                                    <option value="AFC">AFC (Asia)</option>
+                                    <option value="CONCACAF">CONCACAF (N/C America)</option>
+                                    <option value="OFC">OFC (Oceania)</option>
+                                </select>
+                            </div>
+                            <div class="grid grid-2">
+                                <div class="field">
+                                    <label>Available Teams - <span id="exp-team-count">0</span> available</label>
+                                    <select id="exp-fill-teams" multiple size="10" style="height:200px" onchange="updateSelectedTeamsDisplay()">
+                                    </select>
+                                    <div style="display:flex;gap:4px;margin-top:4px">
+                                        <button class="btn btn-secondary" style="flex:1;font-size:0.7rem;padding:4px" onclick="selectAllExpandTeams()">Select All</button>
+                                        <button class="btn btn-secondary" style="flex:1;font-size:0.7rem;padding:4px" onclick="deselectAllExpandTeams()">Deselect All</button>
+                                    </div>
+                                </div>
+                                <div class="field">
+                                    <label>Selected to Add - <span id="exp-selected-count" style="color:#238636">0</span> teams</label>
+                                    <div id="exp-selected-teams" style="height:200px;overflow-y:auto;background:#0d1117;border:1px solid #30363d;border-radius:4px;padding:8px;font-size:0.75rem">
+                                        <span style="color:#8b949e">Ctrl+Click to select teams</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="section">
+                        <div class="section-title">📋 Preview Changes</div>
+                        <div id="exp-preview" style="background:#0d1117;border:1px solid #30363d;border-radius:6px;padding:10px;font-family:monospace;font-size:0.7rem;max-height:250px;overflow-y:auto;">
+                            <span style="color:#8b949e">Configure options to see preview</span>
+                        </div>
+                    </div>
+                    
+                    <div class="section">
+                        <div style="display:flex;gap:8px">
+                            <button class="btn btn-secondary" onclick="previewExpand()">👁️ Preview</button>
+                            <button class="btn btn-primary" onclick="executeExpand()">📈 Expand Competition</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- DELETE COMPETITION PAGE -->
+            <div id="page-deletecomp" class="page">
+                <h1>🗑️ Delete</h1>
+                <p class="desc">Remove competitions, club friendlies, or nations and all their data from compdata files</p>
+                
+                <div class="section">
+                    <div class="section-title">⚠️ Warning</div>
+                    <p style="font-size:0.8rem;color:#f0883e;margin-bottom:10px">
+                        This will permanently delete the selected item(s) and ALL related data including:
+                        child nodes, stages, groups, settings, schedule, standings, advancement, tasks, objectives, weather, initteams, and compids entries.
+                        Deleting a nation will also delete all competitions under it. Use Undo (Ctrl+Z) to revert.
+                    </p>
+                </div>
+                
+                <div class="section">
+                    <div class="section-title">🎯 Select Competitions to Delete</div>
+                    <div class="grid grid-4">
+                        <div class="field">
+                            <label>Type</label>
+                            <select id="del-type-filter" onchange="filterDeleteCompList()">
+                                <option value="">All</option>
+                                <option value="3">Competitions</option>
+                                <option value="6">Club Friendlies (C90xxx)</option>
+                                <option value="2">Nations</option>
+                            </select>
+                        </div>
+                        <div class="field">
+                            <label>Filter by Parent</label>
+                            <select id="del-parent-filter" onchange="filterDeleteCompList()">
+                                <option value="">-- All --</option>
+                            </select>
+                        </div>
+                        <div class="field">
+                            <label>Gender Filter</label>
+                            <select id="del-gender-filter" onchange="filterDeleteCompList()">
+                                <option value="">All</option>
+                                <option value="women">Women's Only</option>
+                                <option value="men">Men's Only</option>
+                            </select>
+                        </div>
+                        <div class="field">
+                            <label>Search</label>
+                            <input type="text" id="del-search" placeholder="Search by code or name..." oninput="filterDeleteCompList()">
+                        </div>
+                        <div class="field">
+                            <label>Filtered Count</label>
+                            <input type="text" id="del-filtered-count" value="0" readonly style="background:#21262d">
+                        </div>
+                    </div>
+                    <div class="field" style="margin-top:12px">
+                        <label>Competitions (Ctrl+Click or Shift+Click to select multiple)</label>
+                        <select id="del-comp-select" multiple size="12" style="height:300px" onchange="previewDeleteComp()">
+                            <option value="">-- Load compdata first --</option>
+                        </select>
+                    </div>
+                    <div style="display:flex;gap:8px;margin-top:8px">
+                        <button class="btn btn-secondary" onclick="selectAllFilteredComps()">☑️ Select All Filtered</button>
+                        <button class="btn btn-secondary" onclick="clearCompSelection()">✖️ Clear Selection</button>
+                        <span id="del-selected-count" style="margin-left:auto;color:#58a6ff;font-size:0.8rem;align-self:center">0 selected</span>
+                    </div>
+                </div>
+                
+                <div class="section">
+                    <div class="section-title">📋 Data to be Deleted</div>
+                    <div id="del-preview" style="background:#0d1117;border:1px solid #30363d;border-radius:6px;padding:10px;font-family:monospace;font-size:0.7rem;max-height:300px;overflow-y:auto;">
+                        <span style="color:#8b949e">Select competition(s) to see what will be deleted</span>
+                    </div>
+                </div>
+                
+                <div class="section">
+                    <div class="section-title">🗑️ Confirm Deletion</div>
+                    <div class="field">
+                        <label>Type DELETE to confirm</label>
+                        <input type="text" id="del-confirm-input" placeholder="Type DELETE here...">
+                    </div>
+                    <div class="field" style="margin-top:12px">
+                        <label>
+                            <input type="checkbox" id="del-compact-ids" checked> 
+                            Compact IDs after deletion (renumber to close gaps)
+                        </label>
+                        <div style="font-size:0.7rem;color:#8b949e;margin-top:4px">
+                            Recommended: Keeps IDs sequential and updates all references
+                        </div>
+                    </div>
+                    <div style="margin-top:12px">
+                        <button class="btn btn-primary" style="background:#da3633" onclick="executeDeleteComp()">🗑️ Delete Selected Competitions</button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Schedule Page -->
+            <div id="page-schedule" class="page">
+                <h1>📅 Competition Schedule</h1>
+                <p class="desc">Visual timeline of all competitions - plan and detect conflicts</p>
+                
+                <div style="display:flex;gap:16px;height:calc(100vh - 140px)">
+                    <!-- Timeline Canvas (70%) -->
+                    <div style="flex:0 0 70%;display:flex;flex-direction:column;gap:12px">
+                        <!-- Controls -->
+                        <div class="section" style="padding:10px">
+                            <div style="display:flex;gap:12px;align-items:center">
+                                <div class="field" style="flex:0 0 auto">
+                                    <label>View</label>
+                                    <select id="schedule-view" onchange="renderSchedule()" style="width:120px">
+                                        <option value="full">Full Season</option>
+                                        <option value="month">Monthly</option>
+                                    </select>
+                                </div>
+                                <div class="field" style="flex:0 0 auto" id="schedule-month-picker" style="display:none">
+                                    <label>Month</label>
+                                    <select id="schedule-month" onchange="renderSchedule()" style="width:150px">
+                                        <option value="0">August (Start)</option>
+                                        <option value="1">September</option>
+                                        <option value="2">October</option>
+                                        <option value="3">November</option>
+                                        <option value="4">December</option>
+                                        <option value="5">January</option>
+                                        <option value="6">February</option>
+                                        <option value="7">March</option>
+                                        <option value="8">April</option>
+                                        <option value="9">May</option>
+                                        <option value="10">June</option>
+                                        <option value="11">July</option>
+                                    </select>
+                                </div>
+                                <div style="margin-left:auto;display:flex;gap:8px;align-items:center">
+                                    <label style="font-size:0.7rem;color:#8b949e;cursor:pointer">
+                                        <input type="checkbox" id="schedule-filter-domestic" checked onchange="renderSchedule()"> Domestic
+                                    </label>
+                                    <label style="font-size:0.7rem;color:#8b949e;cursor:pointer">
+                                        <input type="checkbox" id="schedule-filter-cups" checked onchange="renderSchedule()"> Cups
+                                    </label>
+                                    <label style="font-size:0.7rem;color:#8b949e;cursor:pointer">
+                                        <input type="checkbox" id="schedule-filter-international" checked onchange="renderSchedule()"> International
+                                    </label>
+                                    <label style="font-size:0.7rem;color:#8b949e;cursor:pointer">
+                                        <input type="checkbox" id="schedule-show-windows" checked onchange="renderSchedule()"> Intl Windows
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Timeline Canvas -->
+                        <div class="section" style="flex:1;padding:0;overflow:hidden;position:relative">
+                            <div id="schedule-canvas-container" style="height:100%;overflow:auto;position:relative">
+                                <canvas id="schedule-canvas" style="display:block;cursor:pointer"></canvas>
+                            </div>
+                        </div>
+                        
+                        <!-- Legend -->
+                        <div class="section" style="padding:8px">
+                            <div style="display:flex;gap:16px;font-size:0.7rem">
+                                <div style="display:flex;align-items:center;gap:4px">
+                                    <div style="width:16px;height:12px;background:#238636;border-radius:2px"></div>
+                                    <span>Domestic League</span>
+                                </div>
+                                <div style="display:flex;align-items:center;gap:4px">
+                                    <div style="width:16px;height:12px;background:#1f6feb;border-radius:2px"></div>
+                                    <span>Cup</span>
+                                </div>
+                                <div style="display:flex;align-items:center;gap:4px">
+                                    <div style="width:16px;height:12px;background:#da3633;border-radius:2px"></div>
+                                    <span>International</span>
+                                </div>
+                                <div style="display:flex;align-items:center;gap:4px">
+                                    <div style="width:16px;height:12px;background:#8b949e;border-radius:2px"></div>
+                                    <span>Other</span>
+                                </div>
+                                <div style="display:flex;align-items:center;gap:4px;margin-left:auto">
+                                    <div style="width:16px;height:12px;background:rgba(248,81,73,0.2);border:1px dashed #f85149;border-radius:2px"></div>
+                                    <span>International Window</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Details Panel (30%) -->
+                    <div style="flex:0 0 30%;display:flex;flex-direction:column;gap:12px;overflow-y:auto">
+                        <!-- Selected Day Info -->
+                        <div class="section">
+                            <div class="section-title">📍 Selected Day</div>
+                            <div id="schedule-day-info" style="font-size:0.75rem">
+                                <span style="color:#8b949e">Click a day on the timeline</span>
+                            </div>
+                        </div>
+                        
+                        <!-- Competition Details -->
+                        <div class="section" id="schedule-comp-details" style="display:none">
+                            <div class="section-title">🏆 Competition Details</div>
+                            <div id="schedule-comp-info" style="font-size:0.75rem"></div>
+                        </div>
+                        
+                        <!-- Quick Actions -->
+                        <div class="section">
+                            <div class="section-title">⚡ Quick Actions</div>
+                            <button class="btn btn-primary" id="schedule-action-btn" onclick="scheduleHereAction()" style="width:100%;margin-bottom:8px" disabled>
+                                Schedule Competition Here
+                            </button>
+                            <button class="btn btn-secondary" onclick="findFreeWindow()" style="width:100%">
+                                Find Free Window
+                            </button>
+                        </div>
+                        
+                        <!-- Conflicts -->
+                        <div class="section" id="schedule-conflicts-panel" style="display:none">
+                            <div class="section-title">⚠️ Schedule Conflicts</div>
+                            <div id="schedule-conflicts-list" style="font-size:0.75rem"></div>
+                        </div>
+                        
+                        <!-- Statistics -->
+                        <div class="section">
+                            <div class="section-title">📊 Statistics</div>
+                            <div id="schedule-stats" style="font-size:0.75rem;color:#8b949e">
+                                Total Competitions: <span id="schedule-stat-total">0</span><br>
+                                Domestic: <span id="schedule-stat-domestic">0</span><br>
+                                Cups: <span id="schedule-stat-cups">0</span><br>
+                                International: <span id="schedule-stat-international">0</span><br>
+                                Busiest Day: <span id="schedule-stat-busiest">-</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    
+    <!-- Load all JS modules -->
+    <script src="js/core.js"></script>
+    <script src="js/ui.js"></script>
+    <script src="js/league.js"></script>
+    <script src="js/cup.js"></script>
+    <script src="js/clubchamp.js"></script>
+    <script src="js/tools.js"></script>
+    <script src="js/international.js"></script>
+    <script src="js/schedule.js"></script>
+    <!-- Native bridge (no-op in browser) -->
+    <script src="js/tauri-bridge.js"></script>
+</body>
+</html>
